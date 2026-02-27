@@ -21,5 +21,5 @@ export function getWebSocketUrl(endpointId: string): string {
 }
 
 export function getWebhookUrl(endpointId: string): string {
-  return `${window.location.origin}/webhook/${endpointId}`;
+  return `${window.location.origin}/send/${endpointId}`;
 }
