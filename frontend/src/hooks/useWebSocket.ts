@@ -22,11 +22,13 @@ export function useWebSocket(
       reconnectTimerRef.current = null;
     }
     if (wsRef.current) {
+      // Clear keepalive interval
+      clearInterval((wsRef.current as any).__keepalive);
       wsRef.current.onopen = null;
       wsRef.current.onmessage = null;
       wsRef.current.onclose = null;
       wsRef.current.onerror = null;
-      wsRef.current.close();
+      wsRef.current.close(1000, "cleanup");
       wsRef.current = null;
     }
     setConnected(false);
@@ -54,6 +56,13 @@ export function useWebSocket(
       setConnected(true);
       reconnectAttemptRef.current = 0;
     };
+
+    // Client-side keepalive: send a ping every 25s to prevent idle timeouts
+    const keepalive = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send("ping");
+      }
+    }, 25000);
 
     ws.onmessage = (event) => {
       try {
@@ -86,6 +95,8 @@ export function useWebSocket(
       // Don't close here - let onclose handle reconnection
     };
 
+    // Store the keepalive interval ID on the ws object for cleanup
+    (ws as any).__keepalive = keepalive;
     wsRef.current = ws;
   }, [endpointId]);
 

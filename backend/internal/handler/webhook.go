@@ -97,8 +97,8 @@ func (h *Webhook) Catch(c *fiber.Ctx) error {
 		ResponseHeaders: responseHeaders,
 		StatusCode:      200,
 	}
-	// Broadcast to WebSocket listeners
-	go h.Hub.Broadcast(id, req)
+	// Broadcast to WebSocket listeners (synchronous to avoid goroutine race)
+	h.Hub.Broadcast(id, req)
 	if err := h.Store.PushRequest(id, req); err != nil {
 		log.Printf("push request: %v", err)
 	}
