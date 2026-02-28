@@ -2,7 +2,6 @@ package ws
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -52,7 +51,7 @@ func (h *Hub) Register(endpointID string, conn *websocket.Conn) *ConnEntry {
 	}
 	entry := &ConnEntry{Conn: conn}
 	h.clients[endpointID][conn] = entry
-	log.Printf("ws register: hub=%p endpoint=%s conn=%p total=%d", h, endpointID, conn, len(h.clients[endpointID]))
+	log.Printf("ws register: endpoint=%s conn=%p total=%d", endpointID, conn, len(h.clients[endpointID]))
 	return entry
 }
 
@@ -87,13 +86,6 @@ func (h *Hub) Broadcast(endpointID string, req model.WebhookRequest) {
 
 	// Snapshot entries under read-lock
 	h.mu.RLock()
-	// Diagnostic: dump full hub state
-	allEndpoints := make([]string, 0, len(h.clients))
-	for eid, conns := range h.clients {
-		allEndpoints = append(allEndpoints, fmt.Sprintf("%s(%d)", eid[:8], len(conns)))
-	}
-	log.Printf("ws broadcast: hub=%p endpoint=%s hub_state=%v", h, endpointID, allEndpoints)
-
 	entries := make([]*ConnEntry, 0, len(h.clients[endpointID]))
 	for _, entry := range h.clients[endpointID] {
 		entries = append(entries, entry)
