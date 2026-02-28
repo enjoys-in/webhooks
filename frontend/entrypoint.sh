@@ -12,4 +12,4 @@ EOF
 echo "Runtime config generated:"
 cat /app/dist/runtime-config.js
 
-exec serve -s dist -l 4173
+exec serve -s dist -l 4173 -c dist/serve.json

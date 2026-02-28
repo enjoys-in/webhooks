@@ -1,0 +1,2 @@
+# ads.txt — Webhook Catcher does not participate in advertising
+# This file exists to prevent ads.txt-related SEO warnings

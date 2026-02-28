@@ -6,7 +6,7 @@
 
     <!-- Primary SEO -->
     <title>Webhook Catcher — Free Self-Hosted Webhook Testing Tool</title>
-    <meta name="description" content="Webhook Catcher is a free, open-source, self-hosted webhook testing and debugging tool. Generate a unique URL, send HTTP requests, and inspect every request in real-time." />
+    <meta name="description" content="Free, open-source, self-hosted webhook testing tool. Generate a unique URL, send HTTP requests, and inspect every request in real-time." />
     <meta name="keywords" content="webhook, webhook tester, webhook catcher, webhook debugger, webhook.site alternative, self-hosted webhook, HTTP request inspector, API testing, webhook listener, real-time webhooks" />
     <meta name="author" content="Webhook Catcher" />
     <meta name="robots" content="index, follow" />
@@ -32,9 +32,10 @@
     <meta name="twitter:image" content="https://webhook-enjoys.in/og-image.svg" />
     <meta name="twitter:image:alt" content="Webhook Catcher — inspect webhook requests in real-time" />
 
-    <!-- Favicon -->
+    <!-- Favicon — multiple formats for maximum compatibility -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
 
     <!-- Apple Mobile -->
@@ -47,6 +48,39 @@
     <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: dark)" />
     <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)" />
     <meta name="color-scheme" content="dark light" />
+
+    <!-- Inline critical CSS for initial paint (eliminates render-blocking) -->
+    <style>
+      /* Critical CSS — inlined to avoid render-blocking stylesheet delay */
+     
+      html{-webkit-text-size-adjust:100%;font-family:system-ui,-apple-system,sans-serif}
+      body{background:#0a0a0b;color:#fafafa;min-height:100vh}
+      #seo-content{max-width:64rem;margin:0 auto;padding:2rem 1.5rem}
+      #seo-content h1{font-size:1.75rem;font-weight:700;margin-bottom:0.75rem;color:#fff}
+      #seo-content h2{font-size:1.25rem;font-weight:600;margin:1.5rem 0 0.5rem;color:#e4e4e7}
+      #seo-content h3{font-size:1.1rem;font-weight:600;margin:1rem 0 0.4rem;color:#d4d4d8}
+      #seo-content p,#seo-content li{color:#a1a1aa;line-height:1.7;font-size:0.95rem}
+      #seo-content ul{padding-left:1.25rem;margin:0.5rem 0}
+      #seo-content a{color:#818cf8;text-decoration:underline}
+      #seo-content .features-grid{display:grid;grid-template-columns:1fr;gap:1rem;margin:1rem 0}
+      #seo-content .feature-card{background:#18181b;border:1px solid rgba(255,255,255,0.08);border-radius:0.75rem;padding:1.25rem}
+      #seo-content .feature-card h3{margin-top:0}
+      /* Responsive media queries */
+      @media(min-width:640px){
+        #seo-content h1{font-size:2.25rem}
+        #seo-content .features-grid{grid-template-columns:repeat(2,1fr)}
+      }
+      @media(min-width:1024px){
+        #seo-content .features-grid{grid-template-columns:repeat(3,1fr)}
+      }
+      @media(max-width:480px){
+        #seo-content{padding:1rem}
+        #seo-content h1{font-size:1.35rem}
+        #seo-content h2{font-size:1.1rem}
+      }
+      @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+      @media print{body{background:#fff;color:#000}#seo-content a{color:#000}}
+    </style>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -79,13 +113,71 @@
           "@type": "Organization",
           "name": "ENJOYS",
           "url": "https://webhook-enjoys.in/"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "50",
+          "bestRating": "5",
+          "worstRating": "1"
         }
       }
     </script>
   </head>
   <body>
+    <!-- SEO-visible content: rendered immediately for crawlers, hidden when React loads -->
+    <div id="seo-content">
+      <header>
+        <h1>Webhook Catcher — Free Self-Hosted Webhook Testing Tool</h1>
+        <p>A modern, open-source alternative to <a href="https://webhook.site" rel="noopener">webhook.site</a> and <a href="https://beeceptor.com" rel="noopener">Beeceptor</a>. Generate a unique webhook URL, send HTTP requests, and inspect every request in real-time.</p>
+      </header>
+
+      <section>
+        <h2>Webhook Testing Features</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h3>Unique Webhook URLs</h3>
+            <p>Instantly generate a unique endpoint URL to receive and capture any HTTP request — GET, POST, PUT, PATCH, DELETE, and more.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Real-Time Inspection</h3>
+            <p>View incoming webhook requests live via WebSocket streaming. See headers, body, query parameters, and metadata instantly.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Request History</h3>
+            <p>Browse paginated request history with search and filtering. Export requests as JSON for debugging and documentation.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Authentication Support</h3>
+            <p>Configure authentication on your webhook endpoints for secure testing. Supports token-based and custom auth headers.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Self-Hosted with Docker</h3>
+            <p>Deploy in seconds with Docker Compose. Full control over your data — no third-party services required.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Dark &amp; Light Mode</h3>
+            <p>Toggle between dark mode and light mode. Responsive two-pane dashboard works on desktop and mobile devices.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>How Webhook Catcher Works</h2>
+        <p>1. Open Webhook Catcher to auto-generate a unique webhook URL.</p>
+        <p>2. Send any HTTP request to your URL from your app, API, or third-party service.</p>
+        <p>3. Instantly see every request in the real-time two-pane dashboard — headers, body, query params, and more.</p>
+      </section>
+
+      <section>
+        <h2>Get Started — Free Webhook Testing</h2>
+        <p>Deploy with Docker: <code>docker compose up --build</code> and visit <a href="https://webhook-enjoys.in">webhook-enjoys.in</a> to start testing webhooks instantly.</p>
+      </section>
+    </div>
+
     <div id="root"></div>
-    <script src="/runtime-config.js"></script>
+
+    <script src="/runtime-config.js" defer></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

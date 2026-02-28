@@ -31,6 +31,7 @@ function LinkIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       className="h-6 w-6 text-primary"
+      aria-hidden="true"
     >
       <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
       <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
@@ -50,6 +51,7 @@ function SunIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <circle cx="12" cy="12" r="4" />
       <path d="M12 2v2" />
@@ -76,6 +78,7 @@ function MoonIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
     </svg>
@@ -88,7 +91,7 @@ function MoonIcon() {
 
 function MenuIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="4" x2="20" y1="12" y2="12" />
       <line x1="4" x2="20" y1="6" y2="6" />
       <line x1="4" x2="20" y1="18" y2="18" />
@@ -98,7 +101,7 @@ function MenuIcon() {
 
 function DownloadIcon() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" />
     </svg>
   );
@@ -106,7 +109,7 @@ function DownloadIcon() {
 
 function WifiIcon({ connected }: { connected: boolean }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={connected ? "text-green-500" : "text-red-500"}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={connected ? "text-green-500" : "text-red-500"} aria-hidden="true">
       {connected ? (
         <>
           <path d="M5 12.55a11 11 0 0 1 14.08 0" />
@@ -284,7 +287,7 @@ export default function Dashboard() {
   return (
     <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
       {/* Header */}
-      <header className="border-b px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between bg-card shrink-0 relative">
+      <header className="border-b px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between bg-card shrink-0 relative" role="banner">
         <div className="flex items-center gap-2">
           <LinkIcon />
           <h1 className="text-base sm:text-lg font-semibold">Webhook Catcher</h1>
@@ -411,7 +414,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main two-pane layout */}
-      <div className="flex-1 min-h-0 flex overflow-hidden">
+      <main className="flex-1 min-h-0 flex overflow-hidden" role="main" aria-label="Webhook request inspector">
         {/* Left sidebar — scrollable independently */}
         <div
           className={`w-full md:w-72 lg:w-80 border-r shrink-0 overflow-hidden ${
@@ -456,13 +459,14 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-      </div>
+      </main>
 
       {/* Close mobile menu on backdrop click */}
       {mobileMenuOpen && (
         <div
           className="fixed inset-0 z-40 sm:hidden"
           onClick={() => setMobileMenuOpen(false)}
+          role="presentation"
         />
       )}
 
