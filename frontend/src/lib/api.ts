@@ -1,6 +1,8 @@
 import type { EndpointInfo, WebhookRequest, PaginatedRequests, EndpointConfig } from "@/types";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const runtimeCfg = (window as any).__RUNTIME_CONFIG__ || {};
+const API_BASE = runtimeCfg.API_URL || import.meta.env.VITE_API_URL || "";
+const WS_BASE_OVERRIDE = runtimeCfg.WS_URL || import.meta.env.VITE_WS_URL || "";
 
 export async function createEndpoint(): Promise<EndpointInfo> {
   const res = await fetch(`${API_BASE}/api/endpoints`, { method: "POST" });
@@ -52,11 +54,17 @@ export async function updateEndpointConfig(
 }
 
 export function getWebSocketUrl(endpointId: string): string {
+  if (WS_BASE_OVERRIDE) {
+    return `${WS_BASE_OVERRIDE}/ws/${endpointId}`;
+  }
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-  const wsBase = import.meta.env.VITE_WS_URL || `${protocol}//${window.location.host}`;
+  const base = API_BASE || `${protocol}//${window.location.host}`;
+  // If API_BASE is http(s), convert to ws(s)
+  const wsBase = base.replace(/^http/, "ws");
   return `${wsBase}/ws/${endpointId}`;
 }
 
 export function getWebhookUrl(endpointId: string): string {
-  return `${window.location.origin}/send/${endpointId}`;
+  const base = API_BASE || window.location.origin;
+  return `${base}/send/${endpointId}`;
 }

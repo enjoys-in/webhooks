@@ -9,17 +9,23 @@ import (
 	"github.com/webhooks/backend/internal/model"
 )
 
+// connEntry wraps a WebSocket connection with its own write mutex.
+// gorilla/websocket only supports one concurrent writer, so we serialize writes.
+type connEntry struct {
+	conn *websocket.Conn
+	mu   sync.Mutex
+}
+
 // Hub manages WebSocket clients grouped by endpoint ID.
 type Hub struct {
-	// endpointID -> set of connections
-	clients map[string]map[*websocket.Conn]bool
+	clients map[string]map[*websocket.Conn]*connEntry
 	mu      sync.RWMutex
 }
 
 // NewHub creates a ready-to-use Hub.
 func NewHub() *Hub {
 	return &Hub{
-		clients: make(map[string]map[*websocket.Conn]bool),
+		clients: make(map[string]map[*websocket.Conn]*connEntry),
 	}
 }
 
@@ -27,9 +33,9 @@ func NewHub() *Hub {
 func (h *Hub) Register(endpointID string, conn *websocket.Conn) {
 	h.mu.Lock()
 	if h.clients[endpointID] == nil {
-		h.clients[endpointID] = make(map[*websocket.Conn]bool)
+		h.clients[endpointID] = make(map[*websocket.Conn]*connEntry)
 	}
-	h.clients[endpointID][conn] = true
+	h.clients[endpointID][conn] = &connEntry{conn: conn}
 	h.mu.Unlock()
 }
 
@@ -49,18 +55,28 @@ func (h *Hub) Unregister(endpointID string, conn *websocket.Conn) {
 func (h *Hub) Broadcast(endpointID string, req model.WebhookRequest) {
 	data, err := json.Marshal(req)
 	if err != nil {
+		log.Printf("ws marshal error: %v", err)
 		return
 	}
 
+	// Snapshot entries under read-lock
 	h.mu.RLock()
-	conns := h.clients[endpointID]
+	entries := make([]*connEntry, 0, len(h.clients[endpointID]))
+	for _, entry := range h.clients[endpointID] {
+		entries = append(entries, entry)
+	}
 	h.mu.RUnlock()
 
-	for conn := range conns {
-		if err := conn.WriteMessage(websocket.TextMessage, data); err != nil {
+	for _, entry := range entries {
+		// Per-connection write mutex — prevents concurrent writes to same conn
+		entry.mu.Lock()
+		err := entry.conn.WriteMessage(websocket.TextMessage, data)
+		entry.mu.Unlock()
+
+		if err != nil {
 			log.Printf("ws write error: %v", err)
-			conn.Close()
-			h.Unregister(endpointID, conn)
+			entry.conn.Close()
+			h.Unregister(endpointID, entry.conn)
 		}
 	}
 }

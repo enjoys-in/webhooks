@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { WebhookRequest, EndpointInfo } from "@/types";
 import {
   createEndpoint,
@@ -84,6 +84,51 @@ function MoonIcon() {
 
 // ─── Dashboard ───────────────────────────────────────────
 
+// ─── Additional Icons ────────────────────────────────────
+
+function MenuIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="4" x2="20" y1="12" y2="12" />
+      <line x1="4" x2="20" y1="6" y2="6" />
+      <line x1="4" x2="20" y1="18" y2="18" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" x2="12" y1="15" y2="3" />
+    </svg>
+  );
+}
+
+function WifiIcon({ connected }: { connected: boolean }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={connected ? "text-green-500" : "text-red-500"}>
+      {connected ? (
+        <>
+          <path d="M5 12.55a11 11 0 0 1 14.08 0" />
+          <path d="M1.42 9a16 16 0 0 1 21.16 0" />
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+          <line x1="12" x2="12.01" y1="20" y2="20" />
+        </>
+      ) : (
+        <>
+          <line x1="1" x2="23" y1="1" y2="23" />
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+          <path d="M10.71 5.05A16 16 0 0 1 22.56 9" />
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+          <line x1="12" x2="12.01" y1="20" y2="20" />
+        </>
+      )}
+    </svg>
+  );
+}
+
 export default function Dashboard() {
   const [endpoint, setEndpoint] = useState<EndpointInfo | null>(null);
   const [requests, setRequests] = useState<WebhookRequest[]>([]);
@@ -94,8 +139,23 @@ export default function Dashboard() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalRequests, setTotalRequests] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const selectedRequest = requests.find((r) => r.id === selectedId) ?? null;
+
+  // ── Filter requests by search ──
+  const filteredRequests = useMemo(() => {
+    if (!searchQuery.trim()) return requests;
+    const q = searchQuery.toLowerCase();
+    return requests.filter(
+      (r) =>
+        r.method.toLowerCase().includes(q) ||
+        r.path.toLowerCase().includes(q) ||
+        r.content_type?.toLowerCase().includes(q) ||
+        r.body?.toLowerCase().includes(q)
+    );
+  }, [requests, searchQuery]);
 
   // ── Bootstrap endpoint ──
 
@@ -151,7 +211,7 @@ export default function Dashboard() {
     [page],
   );
 
-  useWebSocket(endpoint?.id ?? null, handleWsMessage);
+  const wsConnected = useWebSocket(endpoint?.id ?? null, handleWsMessage);
 
   // ── Actions ──
 
@@ -195,6 +255,18 @@ export default function Dashboard() {
 
   const handleToggleDark = () => setDarkMode(toggleDarkMode());
 
+  const handleExport = () => {
+    if (requests.length === 0) return;
+    const data = JSON.stringify(requests, null, 2);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `webhook-requests-${endpoint?.id?.slice(0, 8) ?? "export"}-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // ── Loading gate ──
 
   if (loading && !endpoint) {
@@ -210,14 +282,22 @@ export default function Dashboard() {
   // ── Render ──
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground">
+    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
       {/* Header */}
-      <header className="border-b px-4 py-3 flex items-center justify-between bg-card shrink-0">
+      <header className="border-b px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between bg-card shrink-0 relative">
         <div className="flex items-center gap-2">
           <LinkIcon />
-          <h1 className="text-lg font-semibold">Webhook Catcher</h1>
+          <h1 className="text-base sm:text-lg font-semibold">Webhook Catcher</h1>
+          <div className="flex items-center gap-1 ml-2" title={wsConnected ? "WebSocket connected" : "WebSocket disconnected"}>
+            <WifiIcon connected={wsConnected} />
+            <span className={`text-[10px] hidden sm:inline ${wsConnected ? "text-green-500" : "text-red-500"}`}>
+              {wsConnected ? "Live" : "Offline"}
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+
+        {/* Desktop buttons */}
+        <div className="hidden sm:flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
@@ -225,6 +305,15 @@ export default function Dashboard() {
             title="Toggle dark mode"
           >
             {darkMode ? <SunIcon /> : <MoonIcon />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleExport}
+            disabled={requests.length === 0}
+            title="Export requests as JSON"
+          >
+            <DownloadIcon />
           </Button>
           <Button
             variant="outline"
@@ -245,43 +334,106 @@ export default function Dashboard() {
             New URL
           </Button>
         </div>
+
+        {/* Mobile menu button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          className="sm:hidden"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        >
+          <MenuIcon />
+        </Button>
+
+        {/* Mobile dropdown menu */}
+        {mobileMenuOpen && (
+          <div className="absolute top-full right-0 z-50 w-48 bg-card border rounded-lg shadow-lg p-2 sm:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2"
+              onClick={() => { handleToggleDark(); setMobileMenuOpen(false); }}
+            >
+              {darkMode ? <SunIcon /> : <MoonIcon />}
+              {darkMode ? "Light Mode" : "Dark Mode"}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2"
+              onClick={() => { handleExport(); setMobileMenuOpen(false); }}
+              disabled={requests.length === 0}
+            >
+              <DownloadIcon />
+              Export JSON
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2"
+              onClick={() => { setShowAuthConfig(true); setMobileMenuOpen(false); }}
+            >
+              Auth Config
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2 text-destructive"
+              onClick={() => { handleClearAll(); setMobileMenuOpen(false); }}
+              disabled={requests.length === 0}
+            >
+              Clear All
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start gap-2"
+              onClick={() => { handleNewEndpoint(); setMobileMenuOpen(false); }}
+            >
+              New URL
+            </Button>
+          </div>
+        )}
       </header>
 
       {/* URL Bar */}
-      <div className="border-b px-4 py-2.5 flex items-center gap-3 bg-muted/30 shrink-0">
-        <span className="text-sm text-muted-foreground font-medium whitespace-nowrap">
-          Your URL:
+      <div className="border-b px-3 sm:px-4 py-2 sm:py-2.5 flex items-center gap-2 sm:gap-3 bg-muted/30 shrink-0">
+        <span className="text-xs sm:text-sm text-muted-foreground font-medium whitespace-nowrap">
+          URL:
         </span>
-        <code className="flex-1 text-sm bg-background border rounded-md px-3 py-1.5 font-mono select-all truncate">
+        <code className="flex-1 text-xs sm:text-sm bg-background border rounded-md px-2 sm:px-3 py-1 sm:py-1.5 font-mono select-all truncate min-w-0">
           {webhookUrl}
         </code>
-        <CopyButton text={webhookUrl} label="Copy URL" />
-        <Badge variant="secondary" className="tabular-nums">
-          {totalRequests} request{totalRequests !== 1 ? "s" : ""}
+        <CopyButton text={webhookUrl} label="Copy" />
+        <Badge variant="secondary" className="tabular-nums text-[10px] sm:text-xs shrink-0">
+          {totalRequests}
         </Badge>
       </div>
 
       {/* Main two-pane layout */}
-      <div className="flex-1 min-h-0 flex">
-        {/* Left sidebar — hidden on mobile when a request is selected */}
+      <div className="flex-1 min-h-0 flex overflow-hidden">
+        {/* Left sidebar — scrollable independently */}
         <div
-          className={`w-full md:w-72 lg:w-80 border-r flex-shrink-0 ${
+          className={`w-full md:w-72 lg:w-80 border-r shrink-0 overflow-hidden ${
             selectedId ? "hidden md:flex" : "flex"
           } flex-col`}
         >
           <RequestList
-            requests={requests}
+            requests={filteredRequests}
             selectedId={selectedId}
             onSelect={setSelectedId}
             page={page}
             totalPages={totalPages}
             onPageChange={handlePageChange}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            totalRequests={totalRequests}
           />
         </div>
 
-        {/* Right detail pane — hidden on mobile when no request selected */}
+        {/* Right detail pane — scrollable independently */}
         <div
-          className={`flex-1 min-w-0 ${
+          className={`flex-1 min-w-0 overflow-hidden ${
             selectedId ? "flex" : "hidden md:flex"
           } flex-col`}
         >
@@ -292,16 +444,27 @@ export default function Dashboard() {
             />
           ) : (
             <div className="h-full flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <p className="text-sm">Select a request to view details</p>
+              <div className="text-center p-4">
+                <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                  <LinkIcon />
+                </div>
+                <p className="text-sm font-medium">No request selected</p>
                 <p className="text-xs mt-1">
-                  Or send a request to your webhook URL
+                  Send a webhook to your URL or select a request from the list
                 </p>
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Close mobile menu on backdrop click */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 sm:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
 
       {/* Auth Config Modal */}
       {showAuthConfig && endpoint && (
