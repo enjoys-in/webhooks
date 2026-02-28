@@ -4,6 +4,7 @@ import { METHOD_COLORS } from "@/utils/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { RefreshCcw } from "lucide-react";
 
 interface RequestListProps {
   requests: WebhookRequest[];
@@ -15,6 +16,7 @@ interface RequestListProps {
   searchQuery?: string;
   onSearchChange?: (query: string) => void;
   totalRequests?: number;
+  refetchRequests: () => void;
 }
 
 export default function RequestList({
@@ -27,6 +29,7 @@ export default function RequestList({
   searchQuery = "",
   onSearchChange,
   totalRequests,
+  refetchRequests,
 }: RequestListProps) {
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -35,7 +38,11 @@ export default function RequestList({
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Requests
         </h2>
-        <div className="flex items-center gap-2">
+       <div className="flex items-center gap-2">
+         <Button variant="secondary" className="cursor-pointer" size={"sm"}   onClick={refetchRequests}>
+          <RefreshCcw className="w-3 h-3" />
+        </Button>
+         <div className="flex items-center gap-2">
           {totalRequests != null && (
             <Badge variant="secondary" className="text-[10px] tabular-nums">
               {requests.length}{totalRequests !== requests.length ? ` / ${totalRequests}` : ""}
@@ -47,6 +54,7 @@ export default function RequestList({
             </span>
           )}
         </div>
+       </div>
       </div>
 
       {/* Search bar */}

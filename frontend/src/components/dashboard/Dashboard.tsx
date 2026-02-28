@@ -431,6 +431,7 @@ export default function Dashboard() {
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             totalRequests={totalRequests}
+            refetchRequests={() => loadRequests(endpoint!.id, 1)}
           />
         </div>
 
