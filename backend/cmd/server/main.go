@@ -93,6 +93,10 @@ func main() {
 	api.Post("/endpoints", endpointH.Create)
 	api.Get("/endpoints/:id", endpointH.Get)
 	api.Get("/endpoints/:id/requests", endpointH.GetRequests)
+	api.Get("/endpoints/:id/requests/page", endpointH.GetRequestsPaginated)
+	api.Delete("/endpoints/:id/requests", endpointH.ClearRequests)
+	api.Get("/endpoints/:id/config", endpointH.GetConfig)
+	api.Put("/endpoints/:id/config", endpointH.UpdateConfig)
 
 	// Webhook capture – accepts ANY method
 	app.All("/send/:id", webhookH.Catch)

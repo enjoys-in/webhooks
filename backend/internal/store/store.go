@@ -10,5 +10,9 @@ type Store interface {
 	Exists(id string) bool
 	PushRequest(endpointID string, req model.WebhookRequest) error
 	GetRequests(endpointID string) ([]model.WebhookRequest, error)
+	GetRequestsPaginated(endpointID string, page, perPage int) (model.PaginatedRequests, error)
+	ClearRequests(endpointID string) error
+	UpdateEndpointConfig(id string, cfg model.EndpointConfig) error
+	GetEndpointConfig(id string) (model.EndpointConfig, error)
 	Close() error
 }

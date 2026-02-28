@@ -7,6 +7,7 @@ export interface WebhookRequest {
   body: string;
   content_type: string;
   content_length: number;
+  body_size: number;
   remote_addr: string;
   host: string;
   timestamp: string;
@@ -19,4 +20,23 @@ export interface EndpointInfo {
   id: string;
   url: string;
   created_at: string;
+}
+
+export type AuthMode = "none" | "password" | "token" | "hmac";
+
+export type AuthLocation = "header" | "query" | "body";
+
+export interface EndpointConfig {
+  auth_mode: AuthMode;
+  auth_secret?: string;
+  auth_location?: AuthLocation;
+  auth_key?: string;
+}
+
+export interface PaginatedRequests {
+  requests: WebhookRequest[];
+  page: number;
+  per_page: number;
+  total: number;
+  total_pages: number;
 }

@@ -1,6 +1,7 @@
 package store
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -14,6 +15,7 @@ type endpoint struct {
 	id        string
 	createdAt time.Time
 	requests  []model.WebhookRequest
+	config    model.EndpointConfig
 	mu        sync.RWMutex
 }
 
@@ -37,12 +39,13 @@ func (m *Memory) CreateEndpoint(id string) (model.Endpoint, error) {
 		id:        id,
 		createdAt: time.Now(),
 		requests:  make([]model.WebhookRequest, 0, 64),
+		config:    model.EndpointConfig{AuthMode: model.AuthNone},
 	}
 	m.mu.Lock()
 	m.endpoints[id] = ep
 	m.mu.Unlock()
 
-	return model.Endpoint{ID: id, CreatedAt: ep.createdAt}, nil
+	return model.Endpoint{ID: id, CreatedAt: ep.createdAt, Config: ep.config}, nil
 }
 
 // GetEndpoint returns endpoint metadata if it exists.
@@ -55,8 +58,9 @@ func (m *Memory) GetEndpoint(id string) (model.Endpoint, bool) {
 	}
 	ep.mu.RLock()
 	count := len(ep.requests)
+	cfg := ep.config
 	ep.mu.RUnlock()
-	return model.Endpoint{ID: ep.id, CreatedAt: ep.createdAt, RequestCount: count}, true
+	return model.Endpoint{ID: ep.id, CreatedAt: ep.createdAt, RequestCount: count, Config: cfg}, true
 }
 
 // Exists checks whether an endpoint is registered.
@@ -98,6 +102,85 @@ func (m *Memory) GetRequests(id string) ([]model.WebhookRequest, error) {
 	copy(out, ep.requests)
 	ep.mu.RUnlock()
 	return out, nil
+}
+
+// GetRequestsPaginated returns a page of requests for an endpoint.
+func (m *Memory) GetRequestsPaginated(id string, page, perPage int) (model.PaginatedRequests, error) {
+	m.mu.RLock()
+	ep, ok := m.endpoints[id]
+	m.mu.RUnlock()
+	if !ok {
+		return model.PaginatedRequests{Requests: []model.WebhookRequest{}, Page: page, PerPage: perPage}, nil
+	}
+
+	ep.mu.RLock()
+	total := len(ep.requests)
+	start := (page - 1) * perPage
+	if start > total {
+		start = total
+	}
+	end := start + perPage
+	if end > total {
+		end = total
+	}
+	slice := make([]model.WebhookRequest, end-start)
+	copy(slice, ep.requests[start:end])
+	ep.mu.RUnlock()
+
+	totalPages := (total + perPage - 1) / perPage
+	if totalPages == 0 {
+		totalPages = 1
+	}
+
+	return model.PaginatedRequests{
+		Requests:   slice,
+		Page:       page,
+		PerPage:    perPage,
+		Total:      total,
+		TotalPages: totalPages,
+	}, nil
+}
+
+// ClearRequests removes all stored requests for an endpoint.
+func (m *Memory) ClearRequests(id string) error {
+	m.mu.RLock()
+	ep, ok := m.endpoints[id]
+	m.mu.RUnlock()
+	if !ok {
+		return fmt.Errorf("endpoint %s not found", id)
+	}
+	ep.mu.Lock()
+	ep.requests = ep.requests[:0]
+	ep.mu.Unlock()
+	return nil
+}
+
+// UpdateEndpointConfig updates the auth configuration for an endpoint.
+func (m *Memory) UpdateEndpointConfig(id string, cfg model.EndpointConfig) error {
+	m.mu.RLock()
+	ep, ok := m.endpoints[id]
+	m.mu.RUnlock()
+	if !ok {
+		return fmt.Errorf("endpoint %s not found", id)
+	}
+	ep.mu.Lock()
+	ep.config = cfg
+	ep.mu.Unlock()
+	return nil
+}
+
+// GetEndpointConfig returns the auth configuration for an endpoint.
+func (m *Memory) GetEndpointConfig(id string) (model.EndpointConfig, error) {
+	m.mu.RLock()
+	ep, ok := m.endpoints[id]
+	m.mu.RUnlock()
+	if !ok {
+		return model.EndpointConfig{}, fmt.Errorf("endpoint %s not found", id)
+	}
+	ep.mu.RLock()
+	cfg := ep.config
+	ep.mu.RUnlock()
+	return cfg, nil
 }
 
 // Close is a no-op for the memory store.
