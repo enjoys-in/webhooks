@@ -1,0 +1,19 @@
+{
+  "name": "Webhook Catcher",
+  "short_name": "Webhooks",
+  "description": "Free, self-hosted webhook testing tool. Generate a unique URL, send HTTP requests, and inspect every request in real-time.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0b",
+  "theme_color": "#6366f1",
+  "orientation": "any",
+  "categories": ["developer", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

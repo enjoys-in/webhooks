@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23"/>
+      <stop offset="100%" style="stop-color:#1a1a3e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#a78bfa"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle grid pattern -->
+  <g stroke="#ffffff" stroke-width="0.5" opacity="0.04">
+    <line x1="0" y1="0" x2="0" y2="630"/><line x1="60" y1="0" x2="60" y2="630"/>
+    <line x1="120" y1="0" x2="120" y2="630"/><line x1="180" y1="0" x2="180" y2="630"/>
+    <line x1="240" y1="0" x2="240" y2="630"/><line x1="300" y1="0" x2="300" y2="630"/>
+    <line x1="360" y1="0" x2="360" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/>
+    <line x1="480" y1="0" x2="480" y2="630"/><line x1="540" y1="0" x2="540" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/><line x1="660" y1="0" x2="660" y2="630"/>
+    <line x1="720" y1="0" x2="720" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/>
+    <line x1="840" y1="0" x2="840" y2="630"/><line x1="900" y1="0" x2="900" y2="630"/>
+    <line x1="960" y1="0" x2="960" y2="630"/><line x1="1020" y1="0" x2="1020" y2="630"/>
+    <line x1="1080" y1="0" x2="1080" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/>
+    <line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/>
+    <line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/>
+    <line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/>
+    <line x1="0" y1="540" x2="1200" y2="540"/><line x1="0" y1="600" x2="1200" y2="600"/>
+  </g>
+
+  <!-- Accent glow -->
+  <circle cx="160" cy="315" r="200" fill="#6366f1" opacity="0.08"/>
+
+  <!-- Icon area: webhook hook -->
+  <g transform="translate(120, 220)">
+    <rect width="100" height="100" rx="22" fill="url(#accent)"/>
+    <g transform="translate(50,50)" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="0" y1="-28" x2="0" y2="4"/>
+      <path d="M0,4 A14,14 0 0,1 -14,18 A14,14 0 0,1 -14,-4"/>
+      <polyline points="-8,-20 0,-28 8,-20"/>
+      <path d="M10,18 A12,12 0 0,0 10,6" stroke-width="4" opacity="0.6"/>
+      <path d="M18,22 A20,20 0 0,0 18,2" stroke-width="4" opacity="0.35"/>
+    </g>
+  </g>
+
+  <!-- Title -->
+  <text x="260" y="265" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="700" fill="#ffffff">Webhook Catcher</text>
+
+  <!-- Subtitle -->
+  <text x="260" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#a1a1aa">Free, self-hosted webhook testing tool</text>
+
+  <!-- Feature pills -->
+  <g transform="translate(260, 340)">
+    <rect x="0" y="0" width="140" height="32" rx="16" fill="#6366f1" opacity="0.2"/>
+    <text x="70" y="21" font-family="system-ui, sans-serif" font-size="13" fill="#a78bfa" text-anchor="middle">Real-time</text>
+
+    <rect x="155" y="0" width="150" height="32" rx="16" fill="#6366f1" opacity="0.2"/>
+    <text x="230" y="21" font-family="system-ui, sans-serif" font-size="13" fill="#a78bfa" text-anchor="middle">Open Source</text>
+
+    <rect x="320" y="0" width="170" height="32" rx="16" fill="#6366f1" opacity="0.2"/>
+    <text x="405" y="21" font-family="system-ui, sans-serif" font-size="13" fill="#a78bfa" text-anchor="middle">Docker Deployable</text>
+
+    <rect x="505" y="0" width="180" height="32" rx="16" fill="#6366f1" opacity="0.2"/>
+    <text x="595" y="21" font-family="system-ui, sans-serif" font-size="13" fill="#a78bfa" text-anchor="middle">All HTTP Methods</text>
+  </g>
+
+  <!-- URL bar -->
+  <text x="260" y="420" font-family="monospace" font-size="17" fill="#6366f1" opacity="0.7">webhook-enjoys.in</text>
+
+  <!-- Bottom border accent -->
+  <rect x="0" y="620" width="1200" height="10" fill="url(#accent)"/>
+</svg>
