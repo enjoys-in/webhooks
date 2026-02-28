@@ -61,12 +61,12 @@ func (h *Webhook) Catch(c *fiber.Ctx) error {
 	elapsed := time.Since(start)
 
 	responseHeaders := map[string]string{
-		"Content-Type":        "application/json",
-		"X-Webhook-ID":        id,
-		"X-Request-Received":  start.Format(time.RFC3339Nano),
-		"X-Response-Time-Ms":  fmt.Sprintf("%.2f", float64(elapsed.Microseconds())/1000),
-		"X-Powered-By":        "Webhook Catcher",
-		"Cache-Control":       "no-cache, no-store",
+		"Content-Type":       "application/json",
+		"X-Webhook-ID":       id,
+		"X-Request-Received": start.Format(time.RFC3339Nano),
+		"X-Response-Time-Ms": fmt.Sprintf("%.2f", float64(elapsed.Microseconds())/1000),
+		"X-Powered-By":       "Webhook Catcher",
+		"Cache-Control":      "no-cache, no-store",
 	}
 
 	for k, v := range responseHeaders {
@@ -97,13 +97,11 @@ func (h *Webhook) Catch(c *fiber.Ctx) error {
 		ResponseHeaders: responseHeaders,
 		StatusCode:      200,
 	}
-
+	// Broadcast to WebSocket listeners
+	go h.Hub.Broadcast(id, req)
 	if err := h.Store.PushRequest(id, req); err != nil {
 		log.Printf("push request: %v", err)
 	}
-
-	// Broadcast to WebSocket listeners
-	go h.Hub.Broadcast(id, req)
 
 	return c.JSON(fiber.Map{
 		"success": true,
